@@ -50,33 +50,33 @@ def main():
         
         logs = open("history.txt", "a+", encoding="utf-8")
         try:
-            res = openai.ChatCompletion.create(
+            res = openai.chat.completions.create(
                 model="gpt-3.5-turbo-16k",
                 messages = messages,
                 temperature = 0.0,
                 max_tokens = 800
             )
 
-            message = res["choices"][0]["message"].to_dict()
+            message = res.choices[0].message
 
-            if "$cd" in message["content"] or "$ cd" in message["content"]:
-                message["content"] = message["content"].split("\n")[1]
+            if "$cd" in message.content or "$ cd" in message.content:
+                message.content = message.content.split("\n")[1]
 
             lines = []
 
             messages.append(message)
 
-            logs.write(messages[len(messages) - 1]["content"])
+            logs.write(messages[len(messages) - 1].content)
             logs.close()
 
             logs = open("history.txt", "a+", encoding="utf-8")
             
-            if "will be reported" in messages[len(messages) - 1]["content"]:
-                print(messages[len(messages) - 1]["content"])
+            if "will be reported" in messages[len(messages) - 1].content:
+                print(messages[len(messages) - 1].content)
                 raise KeyboardInterrupt 
 
-            if "PING" in message["content"]:
-                lines = message["content"].split("\n")
+            if "PING" in message.content:
+                lines = message.content.split("\n")
                 print(lines[0])
 
                 for i in range(1, len(lines)-5):
@@ -91,8 +91,8 @@ def main():
                 logs.write(" " + user_input + f"\t<{datetime.now()}>\n")
 
             else:
-                #print("\n", messages[len(messages) - 1]["content"], " ")
-                user_input = input(f'\n{messages[len(messages) - 1]["content"]}'.strip() + " ")
+                #print("\n", messages[len(messages) - 1].content, " ")
+                user_input = input(f'\n{messages[len(messages) - 1].content}'.strip() + " ")
                 messages.append({"role": "user", "content": " " + user_input + f"\t<{datetime.now()}>\n"})
                 logs.write(" " + user_input + f"\t<{datetime.now()}>\n")
             
